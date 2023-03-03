@@ -25,6 +25,8 @@ struct ContentView: View {
     @State private var scoreTitle = ""
     @State private var alertMessage = ""
     @State private var questionsCount = 1
+    @State var flagTappedNumber: Int? = nil
+    @State var animationAmount = 0.0
     
     @State var countries = [
         "Estonia",
@@ -71,6 +73,10 @@ struct ContentView: View {
                         } label: {
                             FlagImage(flagName: countries[number])
                         }
+                        .opacity(flagTappedNumber == nil ? 1: flagTappedNumber == number ? 1: 0.5)
+                        .rotation3DEffect(flagTappedNumber == number ? .degrees(animationAmount): .degrees(0), axis: (x: 0, y: 1, z: 0))
+                        .scaleEffect(flagTappedNumber == nil ? 1: flagTappedNumber == number ? 1: 0.5)
+                        .blur(radius: flagTappedNumber == nil ? 0: flagTappedNumber == number ? 0: 5)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -105,6 +111,14 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        // Update UI
+        withAnimation {
+            flagTappedNumber = number
+            animationAmount += 360
+        }
+        
+        
+        // Run logic
         if number == correctAnswer {
             scoreTitle = "Correct!"
             playerScore += 1
@@ -125,6 +139,8 @@ struct ContentView: View {
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        flagTappedNumber = nil
+        animationAmount = 0
     }
     
     func resetGame() {
@@ -132,6 +148,8 @@ struct ContentView: View {
         questionsCount = 1
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        flagTappedNumber = nil
+        animationAmount = 0
     }
 }
 
